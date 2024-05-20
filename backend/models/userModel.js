@@ -1,6 +1,8 @@
 const mongoose=require('mongoose');
 const validator=require('validator');
-const userSchama=mongoose.Schema({
+const bcrypt=require('bcrypt')
+const jwt=require("jsonwebtoken");
+const userSchema=mongoose.Schema({
     first_name:{
         type:String,
         required:[true,"Please provide first name of user"]
@@ -44,8 +46,31 @@ const userSchama=mongoose.Schema({
     updatedAt:{
         type:Date,
         default:Date.now()
-    }
+    },
+    images:[{
+        type:String
+    }]
 })
 
-const User=mongoose.model('user',userSchama);
+// Encrypt password before saving user
+userSchema.pre('save',async function(next){
+    if(!this.isModified('password')){
+        next();
+    }
+    this.password=await bcrypt.hash(this.password,10)
+})
+
+// Return JSON Webtoken
+userSchema.methods.getJwtToken=function(){
+    return jwt.sign({id:this._id},process.env.JWT_SECRET,{
+        expiresIn:process.env.JWT_EXPIRES_TIME
+    })
+}
+userSchema.methods.comparePassword=async function(enterPassword){
+    return await bcrypt.compare(enterPassword,this.password);
+}
+
+
+
+const User=mongoose.model('User',userSchema);
 module.exports=User
