@@ -63,3 +63,19 @@ exports.loginUser=catchError(async(req,res,next)=>{
 
 
 })
+
+exports.isLoggedIn=catchError(async(req,res,next)=>{
+    const user=await User.findById(req.user._id);
+    if(!user){
+    return res.status(404).json({
+            status:false,
+            message:"user not logged in"
+        })
+    }
+    return res.status(200).json({
+        status:true,
+        user
+    })
+
+
+})

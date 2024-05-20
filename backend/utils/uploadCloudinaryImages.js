@@ -20,4 +20,4 @@ const sendImageToCloudinary = async (images) => {
 }
 
 
-module.exports=sendImageToCloudinary
+module.exports=sendImageToCloudinary;
